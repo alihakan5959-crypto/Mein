@@ -1,4 +1,4 @@
-# NetPulse Android 0.2
+# NetPulse Android 0.2.1
 
 Oyun ve diğer uygulamalar üzerinde taşınabilen ağ + görüntü değişimi monitörü.
 
@@ -52,4 +52,6 @@ JDK 17, Gradle 8.9, Android SDK 35:
 Testler ağ sayaçlarının zamanlama/sıfırlama koşullarını; RGBA satır dolgusunu, bölge kırpmasını, pencere maskelemesini, renk farkı eşiğini, eksik örnekleri ve zaman aralığı eşleşmesini kapsar.
 GitHub Actions imzalı debug APK'yı NetPulse-Android ZIP çıktısına koyar.
 CI sanal makinesindeki testler, gerçek telefon ekran paylaşımı/izin testinin yerine geçmez.
-Her CI çalışması yeni debug anahtarı üretebilir; önceki APK ile imza uyuşmazlığında eski sürümü kaldırıp yeniden kur.
+0.2.1 sürümü ayrı uygulama kimliği (com.example.netpulse.screen) ve NetPulse Ekran adıyla kurulur; eski NetPulse ile çakışmaz. CI test sürümlerinde üretim imzalama anahtarı kullanılmaz. Gelecek debug sürümlerini güncellerken imza değişirse bu test uygulamasını kaldırıp yeniden kurmak gerekebilir.
+
+Kurulum doğrulaması: Android 16 emülatöründe eski APK kurulumu, eski güncellemenin imza sonucu, yeni paketin yan yana kurulumu, kayan pencere servisi ve kullanıcı onaylı ekran paylaşımı çalıştırılır. Test sonuçları Android-16-install-verification çıktısındadır.

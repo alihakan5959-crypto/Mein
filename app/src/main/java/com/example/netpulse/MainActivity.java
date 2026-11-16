@@ -140,7 +140,7 @@ public final class MainActivity extends Activity {
                 "VPN/sanal arayüzler üst üste sayıma yol açabilir. " +
                 "Fatura ölçümü değildir. 1 KB = 1000 B.\n\n" +
                 "İçerik kaydetmez, internete veri göndermez. " +
-                "NetPulse 0.2 · Android 8+",
+                "NetPulse Ekran 0.2.1 · Android 8+",
                 13, Ui.MUTED);
         note.setLineSpacing(Ui.dp(this, 3), 1);
         page.addView(note);

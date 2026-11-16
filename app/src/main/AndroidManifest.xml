@@ -5,16 +5,16 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
-    <application android:allowBackup="false" android:label="NetPulse"
+    <application android:allowBackup="false" android:label="NetPulse Ekran"
         android:icon="@drawable/ic_stat" android:theme="@style/AppTheme"
         android:supportsRtl="true">
-        <activity android:name=".MainActivity" android:exported="true">
+        <activity android:name="com.example.netpulse.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".MeterService" android:exported="false"
+        <service android:name="com.example.netpulse.MeterService" android:exported="false"
             android:foregroundServiceType="specialUse|mediaProjection">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="User-started floating device network traffic monitor, visible until the user stops it" />

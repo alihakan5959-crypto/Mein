@@ -5,11 +5,12 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -30,13 +31,42 @@ jobs:
       - name: Prepare download
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/NetPulse-Android-0.2.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify dist/NetPulse-Android-0.2.apk
-          sha256sum dist/NetPulse-Android-0.2.apk > dist/SHA256.txt
+          cp app/build/outputs/apk/debug/app-debug.apk dist/NetPulse-Ekran-0.2.1.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify dist/NetPulse-Ekran-0.2.1.apk
+          sha256sum dist/NetPulse-Ekran-0.2.1.apk > dist/SHA256.txt
+      - name: Fetch previous APKs to reproduce upgrade failure
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 43968944692 --repo alihakan5959-crypto/Mein --name NetPulse-Android --dir previous-v01
+          gh run download 43977484609 --repo alihakan5959-crypto/Mein --name NetPulse-Screen-0.2 --dir previous-v02
+          mkdir -p install-report
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs previous-v01/NetPulse-Android.apk > install-report/cert-v01.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs previous-v02/NetPulse-Android-0.2.apk > install-report/cert-v02.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs dist/NetPulse-Ekran-0.2.1.apk > install-report/cert-v021.txt
+      - name: Enable emulator hardware acceleration
+        run: sudo chmod a+rw /dev/kvm
+      - name: Test actual install, floating window and screen consent on Android 16
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: '36'
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 2048M
+          emulator-boot-timeout: 600
+          script: python3 .github/install-smoke.py
+      - name: Upload install verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-16-install-verification
+          path: install-report/
+          if-no-files-found: ignore
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: NetPulse-Screen-0.2
+          name: NetPulse-Ekran-0.2.1
           path: dist/
           if-no-files-found: error
           retention-days: 30
