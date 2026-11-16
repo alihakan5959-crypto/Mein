@@ -6,23 +6,29 @@ import android.view.View;
 import java.util.ArrayList;
 
 final class TrafficGraph extends View {
-    private final ArrayList<Float> values = new ArrayList<>();
+    private static final class Point {
+        final long time;
+        final double rate, motion;
+        Point(long time, double rate, double motion) {
+            this.time = time; this.rate = rate; this.motion = motion;
+        }
+    }
+    private final ArrayList<Point> values = new ArrayList<>();
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
-
     TrafficGraph(Context context) {
         super(context);
-        setContentDescription("Son 60 ölçümde gelen trafik grafiği");
+        setContentDescription("Aynı zaman çizelgesinde gelen trafik ve görüntü değişimi");
     }
-    void add(double rate) {
-        values.add((float) rate);
+    void add(long time, double rate, double motion) {
+        values.add(new Point(time, rate, motion));
         if (values.size() > 60) values.remove(0);
         invalidate();
     }
     void clear() { values.clear(); invalidate(); }
-    float peak() {
-        float result = 1000;
-        for (float value : values) result = Math.max(result, value);
+    double peak() {
+        double result = 1000;
+        for (Point p : values) if (Double.isFinite(p.rate)) result = Math.max(result, p.rate);
         return result;
     }
     @Override protected void onDraw(Canvas canvas) {
@@ -38,18 +44,24 @@ final class TrafficGraph extends View {
             canvas.drawLine(left, y, left + width, y, paint);
         }
         if (values.isEmpty()) return;
-        path.reset();
-        float maximum = peak();
-        for (int i = 0; i < values.size(); i++) {
-            float x = left + i * width / 59;
-            float y = bottom - values.get(i) / maximum * (bottom - top);
-            if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+        long first = values.get(0).time;
+        long span = Math.max(1000, values.get(values.size() - 1).time - first);
+        for (int series = 0; series < 2; series++) {
+            path.reset();
+            boolean connected = false;
+            double max = series == 0 ? peak() : 100;
+            paint.setColor(series == 0 ? Ui.GREEN : Color.rgb(95, 170, 255));
+            paint.setStrokeWidth(Ui.dp(getContext(), 2));
+            for (Point p : values) {
+                double v = series == 0 ? p.rate : p.motion;
+                if (!Double.isFinite(v)) { connected = false; continue; }
+                float x = left + (p.time - first) / (float) span * width;
+                float y = bottom - (float) Math.min(1, v / max) * (bottom - top);
+                if (connected) path.lineTo(x, y); else path.moveTo(x, y);
+                connected = true;
+                canvas.drawCircle(x, y, Ui.dp(getContext(), 1), paint);
+            }
+            canvas.drawPath(path, paint);
         }
-        paint.setColor(Ui.GREEN);
-        paint.setStrokeWidth(Ui.dp(getContext(), 2));
-        if (values.size() == 1) {
-            canvas.drawCircle(left, bottom - values.get(0) / maximum *
-                    (bottom - top), Ui.dp(getContext(), 2), paint);
-        } else canvas.drawPath(path, paint);
     }
 }

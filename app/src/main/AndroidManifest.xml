@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <application android:allowBackup="false" android:label="NetPulse"
         android:icon="@drawable/ic_stat" android:theme="@style/AppTheme"
         android:supportsRtl="true">
@@ -14,7 +15,7 @@
             </intent-filter>
         </activity>
         <service android:name=".MeterService" android:exported="false"
-            android:foregroundServiceType="specialUse">
+            android:foregroundServiceType="specialUse|mediaProjection">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="User-started floating device network traffic monitor, visible until the user stops it" />
         </service>
